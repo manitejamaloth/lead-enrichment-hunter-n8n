@@ -24,7 +24,7 @@ Sales teams spend significant time manually researching and verifying contact de
 
 ## 📄 Workflow Export
 
-Full workflow JSON available in this repo — see `workflow.json`.
+Full workflow JSON available in this repo — see [workflow.json](https://github.com/manitejamaloth/lead-enrichment-hunter-n8n/blob/f5dadeaecf1d64ac6dab86d117ec70641667e468/lead%20processing%20workflow.json)
 
 ## 💡 Impact
 
