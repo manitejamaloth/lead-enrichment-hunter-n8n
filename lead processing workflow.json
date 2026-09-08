@@ -1,0 +1,2622 @@
+{
+  "name": "lead processing workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Contact us",
+        "formDescription": "please fill out the form details and we will get back to you shortly",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Your name goes here",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "placeholder": "Your Email goes here",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company",
+              "placeholder": "Your company name goes here",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Website",
+              "placeholder": "Your company website"
+            },
+            {
+              "fieldLabel": "Job title",
+              "placeholder": "Your job title goes here"
+            },
+            {
+              "fieldLabel": "Interest area",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Sales"
+                  },
+                  {
+                    "option": "Support"
+                  },
+                  {
+                    "option": "Partnerships"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e274068e-ef9f-4415-b5b0-b352b01bae42",
+      "name": "On new lead recieved",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        -416
+      ],
+      "webhookId": "a648a7c6-8cf2-4cfb-a2d4-95155632ca68"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c69e0a1f-56ec-4ff0-bd97-f67ff1cf1be2",
+              "leftValue": "={{ $json.Email.isEmail() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9dd5a291-1815-4dc0-8335-d805ed5a651c",
+              "leftValue": "={{ $json.Email.length }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "01a0343f-8fee-4959-b9a2-f9c309898124",
+              "leftValue": "={{ [\"fakemail.com\", \"tempmail.com\", \"runmail.com\"] }}",
+              "rightValue": "={{ $json.Email.extractDomain() }}",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cd389e10-0da9-405c-b08c-c1abfcf8da15",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        -416
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d23dd464-f0ba-452f-b637-2e3bfba50476",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "valid",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "50245043-a568-40b3-8930-9c843f4ea6eb",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "bd361574-1ff7-4ba0-a450-aa6143fa46b5",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        -560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "all leads log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Full Name": "={{ $('On new lead recieved').item.json.Name }}",
+            "Email": "={{ $('On new lead recieved').item.json.Email }}",
+            "Company": "={{ $('On new lead recieved').item.json.Company }}",
+            "Status": "Discarded",
+            "Reason": "3rd party email validation failed because of invalid status of the email and/or low email deliverability score"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "bac7bc13-03df-4fcf-b6b4-19ee46b92aa4",
+      "name": "Log discarded lead-3rd party email verification failed1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        -480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "all leads log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Full Name": "={{ $('On new lead recieved').item.json.Name }}",
+            "Email": "={{ $('On new lead recieved').item.json.Email }}",
+            "Company": "={{ $('On new lead recieved').item.json.Company }}",
+            "Status": "Discarded",
+            "Reason": "Basic email verification failed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d513a5ce-0329-4130-8817-3e5e0ab06e89",
+      "name": "Log discarded lead-Basic email verification failed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        -368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "emailVerifier",
+        "email": "={{ $json.Email }}"
+      },
+      "type": "n8n-nodes-base.hunter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -560
+      ],
+      "id": "4b2a4edc-3b66-4ab6-8f32-e4be2febe249",
+      "name": "Hunter1",
+      "credentials": {
+        "hunterApi": {
+          "id": "F53R3ox4K6UqUHbr",
+          "name": "Hunter account_mtcut"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.hunter.io/v2/combined/find",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $('On new lead recieved').item.json.Email }}"
+            },
+            {
+              "name": "api_key",
+              "value": "ea30040a788c74f49ae2d06af7623d25c0ad1567"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        -768
+      ],
+      "id": "98b6f927-8fae-47ae-b023-547fd49bd89a",
+      "name": "Enrich lead information"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUyD0FhzHByaFtr",
+          "mode": "list",
+          "cachedResultName": "Customer development CRM",
+          "cachedResultUrl": "https://airtable.com/appUyD0FhzHByaFtr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnevBmzJ2sGgJgU",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appUyD0FhzHByaFtr/tblnevBmzJ2sGgJgU"
+        },
+        "filterByFormula": "={Mail}= '{{ $json.data.person.email }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -768
+      ],
+      "id": "d4ac8881-4ae1-4b0e-af80-45cadb835e94",
+      "name": "Search records",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "MC5ToiwDYbZuxR0Z",
+          "name": "OAuth_1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "data.person.email",
+              "field2": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        -624
+      ],
+      "id": "d860339a-0a46-4f8c-8d24-7384df75cfa8",
+      "name": "unified_enriched_profile"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "fields.Mail",
+              "field2": "data.person.email"
+            }
+          ]
+        },
+        "joinMode": "enrichInput2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1568,
+        -624
+      ],
+      "id": "833ba17a-07e0-4880-aa89-689b78a51d4a",
+      "name": "unified_enriched_profile_with_crm_data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "1ee3516f-a5ea-4e0a-a1d5-36b88ef660a1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New Customer"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ac7abf58-654b-4473-ae76-6a37df1954ed",
+                    "leftValue": "={{ $json.fields['Total Revenue'] }}",
+                    "rightValue": 100000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "General"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f07b4f2f-5a3d-42f0-87fc-8c08806be9e3",
+                    "leftValue": "={{ $json.fields['Total Revenue'] }}",
+                    "rightValue": 100000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": " VIP"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        -640
+      ],
+      "id": "c689a704-fc03-4e00-8b71-697818c8b8f6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2fbec26d-4f11-47e4-9db9-006713eab637",
+              "name": "customer_type_tag",
+              "value": "New Customer",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2016,
+        -864
+      ],
+      "id": "05749368-b578-4376-8d70-76055b0dd565",
+      "name": "tag_new_customer"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2fbec26d-4f11-47e4-9db9-006713eab637",
+              "name": "customer_type_tag",
+              "value": "General Customer",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2016,
+        -672
+      ],
+      "id": "98101f74-4b86-496e-a297-9d0051f25599",
+      "name": "tag_new_general"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2fbec26d-4f11-47e4-9db9-006713eab637",
+              "name": "customer_type_tag",
+              "value": "VIP Customer",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2016,
+        -480
+      ],
+      "id": "1f02ff2d-b9dd-42c0-a4f3-3ebd150caf45",
+      "name": "tag_new_vip"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2fbec26d-4f11-47e4-9db9-006713eab637",
+              "name": "lead_score",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2240,
+        -704
+      ],
+      "id": "fe0dd2c5-51b1-4e80-8989-9a5033822b41",
+      "name": "initialize_lead_score"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f67adbac-3ca0-4c09-ac32-098353d62831",
+              "name": "lead_score",
+              "value": "={{ $json.lead_score + 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2688,
+        -560
+      ],
+      "id": "f2ea9df6-5e5d-4be0-a406-b325977c3542",
+      "name": "increment_lead_score"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f67adbac-3ca0-4c09-ac32-098353d62831",
+              "name": "lead_score",
+              "value": "={{ $json.lead_score + 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3136,
+        -704
+      ],
+      "id": "bd07fba7-2a97-4008-8a98-58d2e5409956",
+      "name": "increment_lead_score1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f67adbac-3ca0-4c09-ac32-098353d62831",
+              "name": "lead_score",
+              "value": "={{ $json.lead_score + 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3584,
+        -704
+      ],
+      "id": "0483e748-b0ff-428f-a92f-24350f5e5bf1",
+      "name": "increment_lead_score2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1d6cdc52-5ca8-4b92-a93e-b5910dfd66fe",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2464,
+        -704
+      ],
+      "id": "332cca7a-e99a-4a8e-ab46-de40edeeb53b",
+      "name": "check_email_confidence"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1d6cdc52-5ca8-4b92-a93e-b5910dfd66fe",
+              "leftValue": "={{ [\"US\", \"DE\", \"IN\", \"UK\"] }}",
+              "rightValue": "={{ $json.data.person.geo.countryCode }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2912,
+        -704
+      ],
+      "id": "c0704f14-97ad-4ff2-831c-9ee05051eb1b",
+      "name": "check_service_region"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1d6cdc52-5ca8-4b92-a93e-b5910dfd66fe",
+              "leftValue": "={{ $json.data.company.category.industry }}",
+              "rightValue": "Software",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3360,
+        -704
+      ],
+      "id": "54497fb1-96c1-4793-a6ed-311faef6779d",
+      "name": "check_industry"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n\n  // Set default lead type\n  item.json.lead_type = \"Medium-Value\";\n\n  // High-value lead\n  if (item.json.lead_score >= 3) {\n    item.json.lead_type = \"High-Value\";\n  }\n\n  // Low-value lead\n  if (item.json.lead_score < 1) {\n    item.json.lead_type = \"Low-Value\";\n  }\n\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        -704
+      ],
+      "id": "af5fd6fc-e194-4a76-ae62-486370f7f33f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.lead_type }}",
+                    "rightValue": "High-Value",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "67b1c29d-bd1c-46ae-86ec-98b2a06d1936"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "High-Value"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fcd16325-d82b-4f48-b33f-07e0adea72fb",
+                    "leftValue": "={{ $json.lead_type }}",
+                    "rightValue": "=Medium-Value",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Medium-Value"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4a26c3b7-510f-4edf-a594-1b50e1208d49",
+                    "leftValue": "={{ $json.lead_type }}",
+                    "rightValue": "Low-Value",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Low-Value"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        4032,
+        -720
+      ],
+      "id": "963a732a-0319-450f-ac73-9d6a9d313825",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0BPD8AQ9T8",
+          "mode": "list",
+          "cachedResultName": "Maniteja (@photographycontingent)"
+        },
+        "text": "Hey New High Value Lead Has arrived. Please check out the details in the PDF uploaded on Google Drive.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        4704,
+        -672
+      ],
+      "id": "5dcf3d07-c07f-4059-a3bb-138a19fa5477",
+      "name": "Alert account executive",
+      "webhookId": "49faa415-dc6e-4d41-8f3d-81db28ee1fbe",
+      "credentials": {
+        "slackApi": {
+          "id": "pxMPZz2p8ea4GK2P",
+          "name": "slack token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1Xd4YPGGBecVYRFJ1j7WKtkX5YlW2KX2Djnn-IL2y-GI",
+          "mode": "list",
+          "cachedResultName": "[company_name]-[full_name]-[customer_type]-template",
+          "cachedResultUrl": "https://docs.google.com/document/d/1Xd4YPGGBecVYRFJ1j7WKtkX5YlW2KX2Djnn-IL2y-GI/edit?usp=drivesdk"
+        },
+        "name": "={{ $('Switch1').item.json.data.company.name }}-{{ $('Switch1').item.json.data.person.name.fullName }}-{{ $('Switch1').item.json.lead_type }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1WX2qwvcIM4-MZUcq3iO1b4vTPWETzVwY",
+          "mode": "list",
+          "cachedResultName": "Capstone data",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WX2qwvcIM4-MZUcq3iO1b4vTPWETzVwY"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4256,
+        -896
+      ],
+      "id": "dc82c615-4be4-4087-9f2e-3b35a9e05e39",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SEH4BGybkrlhJ5Ec",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "data",
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4704,
+        -896
+      ],
+      "id": "90271528-25c7-4eb5-a34a-00ff45e9af5f",
+      "name": "Download as pdf",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SEH4BGybkrlhJ5Ec",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Copy file').item.json.name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1WX2qwvcIM4-MZUcq3iO1b4vTPWETzVwY",
+          "mode": "list",
+          "cachedResultName": "Capstone data",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WX2qwvcIM4-MZUcq3iO1b4vTPWETzVwY"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4928,
+        -896
+      ],
+      "id": "4aeea0ac-ce08-4ce3-b7f3-2964e7484724",
+      "name": "Upload pdf",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SEH4BGybkrlhJ5Ec",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Replace dynamic data').item.json.documentId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5152,
+        -896
+      ],
+      "id": "7b4f1d37-5e2f-4af6-8080-926a86e4eb2b",
+      "name": "Delete a file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SEH4BGybkrlhJ5Ec",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "[company_name]",
+              "replaceText": "={{ $('Switch1').item.json.data.company.name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": " [full_name]",
+              "replaceText": "={{ $('Switch1').item.json.data.person.name.fullName }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "[email]",
+              "replaceText": "={{ $('Switch1').item.json.data.person.email }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        4480,
+        -896
+      ],
+      "id": "d27f2ea2-7b5c-4c8e-9c71-7cc27161aa52",
+      "name": "Replace dynamic data",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "7OvNmgPA8dNM3Qv1",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        5376,
+        -896
+      ],
+      "id": "b9d5a518-5ec9-4d80-99c4-7edc9318667d",
+      "name": "Notify content coordinator",
+      "webhookId": "1c366f07-b45f-47c0-a069-43f52af1bdd7",
+      "credentials": {
+        "slackApi": {
+          "id": "pxMPZz2p8ea4GK2P",
+          "name": "slack token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "manitejamaloth952@gmail,com",
+        "subject": "Approval required for new medium-value lead",
+        "message": "Hey, kindly review the Google document uploaded in Google Drive and provide your guidance for further action.\n",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        4256,
+        -512
+      ],
+      "id": "f7d4a505-188b-4bcc-8ffc-3822f154651c",
+      "name": "Send message and wait for response",
+      "webhookId": "c77bde05-357f-4a6e-b9c8-147c1f1cc951",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7iIkyjwCz3tDZlzD",
+          "name": "randi_babu_randi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "start": "={{ $now.plus(5, 'days').plus(1, 'hour') }}",
+        "end": "={{ $now.plus(5, 'days').plus(2, 'hour') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $('Switch1').item.json.data.person.email }}"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        4928,
+        -672
+      ],
+      "id": "a3870eb3-0b66-4bed-8217-20df9dd15001",
+      "name": "setup customer meeting",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "MKIVz6W5Tcmj5RgC",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5376,
+        -672
+      ],
+      "id": "adaa5bd6-0285-4093-b7e8-73b5df2903dd",
+      "name": "Wait",
+      "webhookId": "51815543-9fdb-496b-95ed-7408b5bdf8c2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Switch1').item.json.data.person.email }}",
+        "subject": "welcome",
+        "emailType": "text",
+        "message": "welcome",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        5152,
+        -672
+      ],
+      "id": "423d050e-953a-4f9f-8e3b-dc7b806878ec",
+      "name": "welcome email",
+      "webhookId": "49d63796-80d7-4beb-a9c0-71822e66a805",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7iIkyjwCz3tDZlzD",
+          "name": "randi_babu_randi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Switch1').item.json.data.person.email }}",
+        "subject": "=follow up\n",
+        "emailType": "text",
+        "message": "follow up",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        5600,
+        -672
+      ],
+      "id": "50edfec5-3acb-4857-a2bd-09769def9738",
+      "name": "Follow up",
+      "webhookId": "9a9104ef-d05a-423c-a343-0b731f1038c9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7iIkyjwCz3tDZlzD",
+          "name": "randi_babu_randi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1144427037,
+          "mode": "list",
+          "cachedResultName": "leads to be nurtured",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=1144427037"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reason for Nurture": "Need more research and details",
+            "Full Name": "={{ $json.data.person.name.fullName }}",
+            "Email": "={{ $json.data.person.email }}",
+            "Company": "={{ $json.data.company.name }}",
+            "Lead Value": "={{ $json.lead_type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason for Nurture",
+              "displayName": "Reason for Nurture",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4256,
+        -320
+      ],
+      "id": "b0e937fc-df5f-4963-84c5-aa8ed57a6b96",
+      "name": "further nurture lead",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "all leads log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Full Name": "={{ $('Switch1').item.json.data.person.name.fullName }}",
+            "Email": "={{ $('Switch1').item.json.data.person.email }}",
+            "Company": "={{ $('Switch1').item.json.data.company.name }}",
+            "Lead Value": "={{ $('Switch1').item.json.lead_type }}",
+            "Status": "To be nurtured",
+            "Reason": "Need more research and bandwidth for further lead profile enrichment "
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4480,
+        -320
+      ],
+      "id": "ebcc4e09-256c-4602-aa54-af62d7a2e4da",
+      "name": "make an all leads log entry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "all leads log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Full Name": "={{ $('Switch1').item.json.data.person.name.fullName }}",
+            "Email": "={{ $('Switch1').item.json.data.person.email }}",
+            "Company": "={{ $('Switch1').item.json.data.company.name }}",
+            "Lead Value": "={{ $('Switch1').item.json.lead_type }}",
+            "Status": "Approved",
+            "Reason": "Need more research and bandwidth for further lead profile enrichment "
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5824,
+        -672
+      ],
+      "id": "d6f34dd0-93d6-4521-bf9c-0eb62cff047c",
+      "name": "make an all leads log entry1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "38814c96-6acc-47e8-8dbb-a6696e41428d",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4480,
+        -512
+      ],
+      "id": "33d8d352-d504-48f3-b4a1-6d982aee3ef0",
+      "name": "sales manager approved"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU",
+          "mode": "list",
+          "cachedResultName": "Capstone project mock data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "all leads log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18vpx21gc5qqiGcIXAVIRuchNbr9ry4Qad3KAbGodjCU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Full Name": "={{ $('Switch1').item.json.data.person.name.fullName }}",
+            "Email": "={{ $('Switch1').item.json.data.person.email }}",
+            "Company": "={{ $('Switch1').item.json.data.company.name }}",
+            "Lead Value": "={{ $('Switch1').item.json.lead_type }}",
+            "Status": "Disapproved",
+            "Reason": "Sales manager did not deem the lead fit for further processing."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Value",
+              "displayName": "Lead Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4704,
+        -464
+      ],
+      "id": "37d74a0e-13c5-4fc7-97fa-c4a76ad6d5d5",
+      "name": "make an all leads log entry2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GMwXIpAE4lt6ugkd",
+          "name": "952"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "On new lead recieved": [
+      {
+        "json": {
+          "submittedAt": "2026-08-27T08:17:23.431Z",
+          "formMode": "instanceAi",
+          "Name": "Maniteja Maloth",
+          "Email": "support@hunter.io",
+          "Company": "ABC corp",
+          "Website": "abc.com",
+          "Job title": "Technical owner",
+          "Interest area": "Support"
+        }
+      }
+    ],
+    "initialize_lead_score": [
+      {
+        "json": {
+          "data": {
+            "person": {
+              "id": "21a07aad-2c89-59cc-870d-a646569e2110",
+              "name": {
+                "fullName": null,
+                "givenName": null,
+                "familyName": null
+              },
+              "email": "support@hunter.io",
+              "location": null,
+              "timeZone": null,
+              "utcOffset": null,
+              "geo": {
+                "city": null,
+                "state": null,
+                "stateCode": null,
+                "country": "IN",
+                "countryCode": null,
+                "lat": null,
+                "lng": null
+              },
+              "bio": null,
+              "site": null,
+              "avatar": null,
+              "employment": {
+                "domain": "hunter.io",
+                "name": "Hunter",
+                "title": null,
+                "role": "support",
+                "subRole": null,
+                "seniority": null
+              },
+              "facebook": {
+                "handle": null
+              },
+              "github": {
+                "handle": null,
+                "id": null,
+                "avatar": null,
+                "company": null,
+                "blog": null,
+                "followers": null,
+                "following": null
+              },
+              "twitter": {
+                "handle": null,
+                "id": null,
+                "bio": null,
+                "followers": null,
+                "following": null,
+                "statuses": null,
+                "favorites": null,
+                "location": null,
+                "site": null,
+                "avatar": null
+              },
+              "linkedin": {
+                "handle": null
+              },
+              "googleplus": {
+                "handle": null
+              },
+              "gravatar": {
+                "handle": null,
+                "urls": [],
+                "avatar": null,
+                "avatars": []
+              },
+              "fuzzy": false,
+              "emailProvider": "google.com",
+              "indexedAt": "2026-08-26",
+              "phone": null,
+              "activeAt": "2026-08-26",
+              "inactiveAt": null
+            },
+            "company": {
+              "id": "95ca56a8-a019-5c41-881e-293d9ca4741a",
+              "name": "Hunter",
+              "legalName": "Hunter",
+              "domain": "hunter.io",
+              "domainAliases": [],
+              "site": {
+                "phoneNumbers": [
+                  "+1 415 712 0049"
+                ],
+                "emailAddresses": [
+                  "engineering@hunter.io",
+                  "press@hunter.io",
+                  "contact@hunter.io",
+                  "support@hunter.io",
+                  "affiliates@hunter.io",
+                  "security@hunter.io",
+                  "billing@hunter.io"
+                ]
+              },
+              "category": {
+                "sector": "Information Technology",
+                "industryGroup": "Software & Services",
+                "industry": "Internet Software & Services",
+                "subIndustry": "Internet Software & Services",
+                "gicsCode": "45103010",
+                "sicCode": "36",
+                "sic4Codes": [
+                  "73"
+                ],
+                "naicsCode": "51",
+                "naics6Codes": [
+                  "519130"
+                ],
+                "naics6Codes2022": [
+                  "519290"
+                ]
+              },
+              "tags": [
+                "email verification",
+                "lead generation",
+                "sales enablement",
+                "contact management",
+                "b2b marketing",
+                "data enrichment",
+                "email outreach",
+                "professional networking",
+                "crm integration",
+                "digital marketing"
+              ],
+              "description": "Hunter is a technology company that specializes in finding and verifying professional email addresses for businesses.",
+              "foundedYear": 2015,
+              "location": "Wilmington, Delaware, United States",
+              "timeZone": "America/New_York",
+              "utcOffset": -5,
+              "geo": {
+                "streetNumber": null,
+                "streetName": null,
+                "subPremise": null,
+                "streetAddress": null,
+                "city": "Wilmington",
+                "postalCode": null,
+                "state": "Delaware",
+                "stateCode": "DE",
+                "country": "United States",
+                "countryCode": "US",
+                "lat": 39.74595,
+                "lng": -75.54659
+              },
+              "logo": "https://logos.hunter.io/hunter.io",
+              "facebook": {
+                "handle": null,
+                "likes": null
+              },
+              "linkedin": {
+                "handle": "company/hunterio"
+              },
+              "twitter": {
+                "handle": null,
+                "id": null,
+                "bio": null,
+                "followers": null,
+                "following": null,
+                "location": null,
+                "site": null,
+                "avatar": null
+              },
+              "crunchbase": {
+                "handle": null
+              },
+              "youtube": {
+                "handle": null
+              },
+              "instagram": {
+                "handle": null
+              },
+              "emailProvider": "google.com",
+              "type": "private",
+              "companyType": "privately held",
+              "ticker": null,
+              "identifiers": {
+                "usEIN": null
+              },
+              "phone": "+1 415 712 0049",
+              "metrics": {
+                "alexaUsRank": null,
+                "alexaGlobalRank": null,
+                "trafficRank": "very_high",
+                "employees": "11-50",
+                "marketCap": null,
+                "raised": null,
+                "annualRevenue": null,
+                "estimatedAnnualRevenue": null,
+                "fiscalYearEnd": null
+              },
+              "indexedAt": "2026-05-26",
+              "tech": [
+                "cloudflare",
+                "cloudflare-browser-insights",
+                "hsts",
+                "http-3",
+                "intercom",
+                "ruby",
+                "ruby-on-rails",
+                "stimulus"
+              ],
+              "techCategories": [
+                "analytics",
+                "customer_support",
+                "dns",
+                "programming_framework",
+                "programming_language",
+                "security",
+                "web_servers"
+              ],
+              "fundingRounds": [],
+              "parent": {
+                "domain": null
+              },
+              "ultimateParent": {
+                "domain": null
+              }
+            }
+          },
+          "meta": {
+            "email": "support@hunter.io"
+          },
+          "status": "valid",
+          "score": 100,
+          "email": "support@hunter.io",
+          "regexp": true,
+          "gibberish": false,
+          "disposable": false,
+          "webmail": false,
+          "mx_records": true,
+          "smtp_server": true,
+          "smtp_check": true,
+          "accept_all": false,
+          "block": false,
+          "sources": [
+            {
+              "domain": "hunter.io",
+              "uri": "https://hunter.io/api-documentation/v2",
+              "extracted_on": "2025-01-25",
+              "last_seen_on": "2026-08-26",
+              "still_on_page": true
+            },
+            {
+              "domain": "hunter.io",
+              "uri": "https://hunter.io/api/v2/docs",
+              "extracted_on": "2025-02-14",
+              "last_seen_on": "2026-08-15",
+              "still_on_page": true
+            },
+            {
+              "domain": "hunter.io",
+              "uri": "https://hunter.io/api-documentation",
+              "extracted_on": "2025-03-20",
+              "last_seen_on": "2026-08-06",
+              "still_on_page": true
+            },
+            {
+              "domain": "withone.ai",
+              "uri": "https://withone.ai/knowledge/hunter/conn_mod_def%253A%253AGKHsrD1wSOg%253A%253AEXQm44xeQT2TBGGW2gxAkg",
+              "extracted_on": "2026-08-03",
+              "last_seen_on": "2026-08-03",
+              "still_on_page": true
+            },
+            {
+              "domain": "university.mindstudio.ai",
+              "uri": "https://university.mindstudio.ai/building-ai-agents/blocks-reference/enrich-company-via-domain",
+              "extracted_on": "2026-07-01",
+              "last_seen_on": "2026-08-01",
+              "still_on_page": true
+            },
+            {
+              "domain": "thesmbguide.com",
+              "uri": "https://thesmbguide.com/hunter-reviews",
+              "extracted_on": "2021-11-01",
+              "last_seen_on": "2026-07-04",
+              "still_on_page": true
+            },
+            {
+              "domain": "pickplugins.com",
+              "uri": "https://pickplugins.com/hunter-bulk-email-verifier-alternatives",
+              "extracted_on": "2025-06-21",
+              "last_seen_on": "2026-06-28",
+              "still_on_page": true
+            },
+            {
+              "domain": "bugbounty.fr",
+              "uri": "https://bugbounty.fr/listing/hunter-io",
+              "extracted_on": "2025-01-31",
+              "last_seen_on": "2026-06-22",
+              "still_on_page": true
+            },
+            {
+              "domain": "infopreneur.blog",
+              "uri": "https://infopreneur.blog/hunter-io-login",
+              "extracted_on": "2024-11-24",
+              "last_seen_on": "2026-06-07",
+              "still_on_page": true
+            },
+            {
+              "domain": "api.hunter.io",
+              "uri": "https://api.hunter.io/api/v2/docs",
+              "extracted_on": "2025-05-01",
+              "last_seen_on": "2025-05-01",
+              "still_on_page": false
+            }
+          ],
+          "result": "deliverable",
+          "_deprecation_notice": "Using result is deprecated, use status instead",
+          "id": "receyngW0Ikikyv2a",
+          "createdTime": "2026-08-27T10:57:04.000Z",
+          "fields": {
+            "Mail": "support@hunter.io",
+            "Role": "Technical owner",
+            "Total Revenue": 100000,
+            "Company": "ABC corp",
+            "Name": "Maniteja Maloth"
+          },
+          "customer_type_tag": "VIP Customer",
+          "lead_score": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On new lead recieved": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Hunter1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log discarded lead-Basic email verification failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Enrich lead information",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "unified_enriched_profile",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Log discarded lead-3rd party email verification failed1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log discarded lead-3rd party email verification failed1": {
+      "main": [
+        []
+      ]
+    },
+    "Log discarded lead-Basic email verification failed": {
+      "main": [
+        []
+      ]
+    },
+    "Hunter1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich lead information": {
+      "main": [
+        [
+          {
+            "node": "unified_enriched_profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "unified_enriched_profile_with_crm_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "unified_enriched_profile": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "unified_enriched_profile_with_crm_data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "unified_enriched_profile_with_crm_data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "tag_new_customer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "tag_new_general",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "tag_new_vip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tag_new_customer": {
+      "main": [
+        [
+          {
+            "node": "initialize_lead_score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tag_new_general": {
+      "main": [
+        [
+          {
+            "node": "initialize_lead_score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tag_new_vip": {
+      "main": [
+        [
+          {
+            "node": "initialize_lead_score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "initialize_lead_score": {
+      "main": [
+        [
+          {
+            "node": "check_email_confidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "increment_lead_score": {
+      "main": [
+        [
+          {
+            "node": "check_service_region",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "increment_lead_score1": {
+      "main": [
+        [
+          {
+            "node": "check_industry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_email_confidence": {
+      "main": [
+        [
+          {
+            "node": "increment_lead_score",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check_service_region",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_service_region": {
+      "main": [
+        [
+          {
+            "node": "increment_lead_score1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check_industry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_industry": {
+      "main": [
+        [
+          {
+            "node": "increment_lead_score2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "increment_lead_score2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Alert account executive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "further nurture lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert account executive": {
+      "main": [
+        [
+          {
+            "node": "setup customer meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Replace dynamic data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download as pdf": {
+      "main": [
+        [
+          {
+            "node": "Upload pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload pdf": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace dynamic data": {
+      "main": [
+        [
+          {
+            "node": "Download as pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file": {
+      "main": [
+        [
+          {
+            "node": "Notify content coordinator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setup customer meeting": {
+      "main": [
+        [
+          {
+            "node": "welcome email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "welcome email": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Follow up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "further nurture lead": {
+      "main": [
+        [
+          {
+            "node": "make an all leads log entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Follow up": {
+      "main": [
+        [
+          {
+            "node": "make an all leads log entry1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "sales manager approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sales manager approved": {
+      "main": [
+        [
+          {
+            "node": "Alert account executive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "make an all leads log entry2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8081ee0c-5e43-4fb4-87d4-1a831ac64055",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "713a7104ce1dc276385bceda102b797ab2b2e4ef8c0d2539544579a33a645d94"
+  },
+  "nodeGroups": [],
+  "id": "BaQSK9xq3UGVka4E",
+  "tags": []
+}
