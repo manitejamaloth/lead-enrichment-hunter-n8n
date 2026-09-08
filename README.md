@@ -20,7 +20,7 @@ Sales teams spend significant time manually researching and verifying contact de
 
 ## 📸 Workflow Screenshot
 
-*(Add screenshot of your n8n canvas here)*
+![Workflow Screenshot](https://github.com/manitejamaloth/lead-enrichment-hunter-n8n/blob/a784059af5ff700293012520d02180afe4d5d69f/Screenshot%202026-09-09%20001804.png)
 
 ## 📄 Workflow Export
 
